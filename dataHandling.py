@@ -42,3 +42,38 @@ merged = merged.merge(wage_data, on = 'STATE_FIPS')
 del merged['statename']
 del merged['RegionName']
 merged = merged.rename(index = str, columns = {'minwage': 'MIN_WAGE'})
+
+
+for state in states:
+    print(state)
+    merged = merged[merged['STATE_FIPS'].str.contains(str(state))]
+    map_data = map_data[map_data['STATE_FIPS'].str.contains(str(state))]
+    #merged['HOURS'] = merged.apply(lambda row: row.RENT/(4*row.MIN_WAGE), axis = 1)
+
+    ### Plotting
+    fig, ax = plt.subplots(1, figsize = (20, 12) )
+    ax.axis('off')
+
+    #Plots 'No Data' layer
+    map_data.plot(ax = ax,
+                color = 'grey',
+                label = 'No Data')
+
+    #hours = list(merged['HOURS'])
+    #hours = [x for x in hours if str(x) != 'nan']
+
+
+    #hour_bins = range(floor(min(hours)), ceil(max(hours)), 3)
+    #hour_bins = [i for i in hour_bins]
+
+    #Plots data layer
+    merged.dropna().plot(ax = ax,
+    #merged.plot(ax = ax,
+                         column = 'RENT',
+                         cmap = 'viridis',
+                         #scheme = 'User_Defined',
+                         #classification_kwds = dict( bins = [10, 20, 30, 40, 50]),
+                         #classification_kwds = dict( bins = hour_bins),
+                         legend = True)
+    plt.savefig(f'Images/{state}.png', dpi = 100)
+    plt.close()
